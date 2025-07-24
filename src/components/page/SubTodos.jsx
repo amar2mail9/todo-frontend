@@ -140,7 +140,7 @@ function SubTodos() {
           ) : subTodos.length === 0 ? (
             <p className="text-gray-600">No subtodos found.</p>
           ) : (
-            <ul className="space-y-4">
+            <ul className="space-y-4 max-h-[50vh] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-emerald-400 scrollbar-track-gray-100">
               {subTodos.map((todo) => (
                 <li
                   key={todo._id}
@@ -154,60 +154,50 @@ function SubTodos() {
                       : todo.textColor || "#000000",
                   }}
                 >
-                  <div className="flex justify-between items-start gap-2">
+                  <div className="flex justify-between items-start">
                     <div>
-                      <h3
-                        className={`text-lg font-semibold ${
-                          todo.complete ? "line-through" : ""
-                        }`}
-                      >
-                        {todo.taskName}
-                      </h3>
-                      <p className="text-sm opacity-90">
-                        {todo.comment || "No comment"}
-                      </p>
-                      <p className="text-xs mt-2 text-gray-700">
-                        Created At: {formatDateTime(todo.createdAt)}
+                      <h3 className="text-lg font-semibold">{todo.taskName}</h3>
+                      <p className="text-sm">{todo.comment}</p>
+                      <p className="text-xs mt-1">
+                        Created: {formatDateTime(todo.createdAt)}
                       </p>
                     </div>
-                    <div className="space-x-2 flex-shrink-0 flex items-center">
+                    <div className="flex gap-2 items-center">
                       <button
                         onClick={() => handleToggleComplete(todo)}
-                        className={`p-2 rounded-md ${
-                          todo.complete
-                            ? "bg-yellow-500 text-white hover:bg-yellow-600"
-                            : "bg-emerald-600 text-white hover:bg-emerald-700"
-                        }`}
                         title={
-                          todo.complete ? "Undo Complete" : "Mark as Complete"
+                          todo.complete
+                            ? "Mark as Incomplete"
+                            : "Mark as Complete"
                         }
+                        className={`p-2 rounded-full transition-all duration-200 ${
+                          todo.complete
+                            ? "bg-white text-emerald-600"
+                            : "bg-emerald-600 text-white"
+                        }`}
                       >
                         {todo.complete ? (
-                          <RotateCcw className="w-4 h-4" />
+                          <RotateCcw size={18} />
                         ) : (
-                          <CheckCircle2 className="w-4 h-4" />
+                          <CheckCircle2 size={18} />
                         )}
                       </button>
 
-                      <div className="flex items-center gap-2">
-                        {/* Edit Button */}
-                        <button
-                          onClick={() => handleEdit(todo)}
-                          title="Edit"
-                          className="p-2 bg-blue-100 text-blue-600 rounded-full hover:bg-blue-200 transition duration-200"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </button>
+                      <button
+                        onClick={() => handleEdit(todo)}
+                        title="Edit"
+                        className="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-full"
+                      >
+                        <Edit size={18} />
+                      </button>
 
-                        {/* Delete Button */}
-                        <button
-                          onClick={() => handleDelete(todo._id)}
-                          title="Delete"
-                          className="p-2 bg-red-100 text-red-600 rounded-full hover:bg-red-200 transition duration-200"
-                        >
-                          <Trash className="w-4 h-4" />
-                        </button>
-                      </div>
+                      <button
+                        onClick={() => handleDelete(todo._id)}
+                        title="Delete"
+                        className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-full"
+                      >
+                        <Trash size={18} />
+                      </button>
                     </div>
                   </div>
                 </li>

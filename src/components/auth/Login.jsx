@@ -32,6 +32,7 @@ function Login() {
       toast.success(data.message || "Login successful!");
       Cookies.set("token", data.accessToken, { expires: 1 });
       navigate("/");
+      Cookies.set("user", JSON.stringify(data.user), { expires: 1 });
     } catch (error) {
       toast.error(error.message || "Something went wrong");
     } finally {
@@ -52,6 +53,7 @@ function Login() {
         }
       );
       const data = await res.json();
+
       if (res.ok) {
         toast.success(data.message);
         Cookies.set("token", data.accessToken, { expires: 1 });
@@ -86,6 +88,7 @@ function Login() {
       Cookies.set("token", data.accessToken, { expires: 1 });
       toast.success(data.message || "Login successful!");
       navigate("/");
+      Cookies.set("user", JSON.stringify(data.user), { expires: 1 });
     } catch (error) {
       toast.error(error.message || "Something went wrong");
     } finally {

@@ -3,8 +3,7 @@ import Layout from "./Layout";
 import { toast } from "react-toastify";
 import Cookies from "js-cookie";
 import { Link } from "react-router-dom";
-
-import { Edit, Plus, PlusCircle, Trash } from "lucide-react";
+import { Edit, PlusCircle, Trash, ClipboardList } from "lucide-react";
 import { formatDateTime } from "../utils/formatDateTime";
 import Spinner from "../Spinner";
 
@@ -19,6 +18,8 @@ function Home() {
     _id: "",
   });
 
+  const user = JSON.parse(Cookies.get("user") || "{}");
+
   const fetchTodos = async () => {
     try {
       setLoading(true);
@@ -29,13 +30,9 @@ function Home() {
           Authorization: `Bearer ${Cookies.get("token")}`,
         },
       });
-
       const data = await res.json();
-      if (data.success) {
-        setMainTodos(data.data || []);
-      } else {
-        toast.error(data.error || "Failed to fetch todos");
-      }
+      if (data.success) setMainTodos(data.data || []);
+      else toast.error(data.error || "Failed to fetch todos");
     } catch (error) {
       toast.error(error.message || "Something went wrong");
     } finally {
@@ -59,11 +56,7 @@ function Home() {
             "Content-Type": "application/json",
             Authorization: `Bearer ${Cookies.get("token")}`,
           },
-          body: JSON.stringify({
-            title: editForm.title,
-            color: editForm.color,
-            textColor: editForm.textColor,
-          }),
+          body: JSON.stringify(editForm),
         }
       );
       const data = await res.json();
@@ -74,7 +67,7 @@ function Home() {
       } else {
         toast.error(data.error || "Update failed");
       }
-    } catch (err) {
+    } catch {
       toast.error("Something went wrong");
     }
   };
@@ -98,7 +91,7 @@ function Home() {
       } else {
         toast.error(data.error);
       }
-    } catch (err) {
+    } catch {
       toast.error("Delete failed");
     }
   };
@@ -109,59 +102,65 @@ function Home() {
 
   return (
     <Layout>
-      <div className="px-[5%] py-20 min-h-screen bg-gray-50">
-        <h2 className="text-3xl font-bold mb-6 text-emerald-700">Your Todos</h2>
+      <div className="px-[5%] py-20 min-h-screen bg-emerald-50">
+        {/* Welcome Heading */}
+        <div className="mb-10">
+          <h2 className="text-2xl font-bold flex items-center gap-2 text-emerald-700">
+            <ClipboardList className="w-6 h-6" />
+            Welcome back,{" "}
+            <span className="capitalize">{user.fullname?.toLowerCase()}</span>
+          </h2>
+        </div>
 
+        {/* Content */}
         {loading ? (
           <Spinner />
         ) : mainTodos.length === 0 ? (
-          <div className="text-gray-500 text-lg text-center mt-10">
-            🎯 No todos found. Start by creating one!
-            <div className="flex justify-center">
-              <Link to={"/create"}>
-                <button className="flex items-center justify-center  gap-2 bg-emerald-600 text-white py-2 px-4 rounded-4xl">
-                  <PlusCircle /> Add Task
-                </button>
-              </Link>
-            </div>
+          <div className="text-center text-gray-500">
+            <p className="text-lg mb-4">
+              🎯 No todos found. Start by creating one!
+            </p>
+            <Link to="/create">
+              <button className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded-full flex items-center gap-2">
+                <PlusCircle className="w-5 h-5" /> Add Task
+              </button>
+            </Link>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
             {mainTodos.map((todo) => (
               <Link to={`/${todo.slug}`} key={todo._id}>
                 <div
-                  className="rounded-xl shadow-md p-5 transition-all hover:scale-[1.02] duration-300 border"
+                  className="rounded-xl p-5 shadow-md transition-transform hover:scale-105 duration-300  overflow-hidden"
                   style={{ background: todo.color, color: todo.textColor }}
                 >
                   <div className="flex justify-between items-start">
                     <div className="w-[80%]">
-                      <h3 className="text-xl capitalize font-bold">
+                      <h3 className="text-xl font-bold truncate capitalize">
                         {todo.title}
                       </h3>
-                      <p className="text-sm mt-2 opacity-75">
+                      <p className="text-sm mt-2 opacity-80">
                         Created: {formatDateTime(todo.createdAt)}
                       </p>
                     </div>
                     <div className="flex flex-col items-end gap-2">
                       <button
-                        type="button"
                         onClick={(e) => {
                           e.preventDefault();
                           openEditModal(todo);
                         }}
+                        className="bg-white/20 hover:bg-white/30 p-1 rounded"
                         title="Edit"
-                        className="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700"
                       >
                         <Edit size={18} />
                       </button>
                       <button
-                        type="button"
                         onClick={(e) => {
                           e.preventDefault();
                           deleteTodo(todo._id);
                         }}
+                        className="bg-white/20 hover:bg-white/30 p-1 rounded"
                         title="Delete"
-                        className="bg-red-600 text-white p-2 rounded-lg hover:bg-red-700"
                       >
                         <Trash size={18} />
                       </button>
@@ -173,8 +172,9 @@ function Home() {
           </div>
         )}
 
+        {/* Edit Modal */}
         {editOpen && (
-          <div className="fixed inset-0 bg-[#1a5e3a71] bg-opacity-50 flex justify-center items-center z-50">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
             <form
               onSubmit={handleEditSubmit}
               className="bg-white rounded-xl p-6 w-full max-w-md shadow-lg"
@@ -188,13 +188,13 @@ function Home() {
                 onChange={(e) =>
                   setEditForm({ ...editForm, title: e.target.value })
                 }
-                className="w-full mb-3 p-2 border rounded-md"
+                className="w-full mb-4 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 placeholder="Title"
                 required
               />
               <div className="flex gap-4 mb-4">
                 <div>
-                  <label className="block text-sm">Background</label>
+                  <label className="text-sm block mb-1">Background</label>
                   <input
                     type="color"
                     value={editForm.color}
@@ -204,15 +204,12 @@ function Home() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm">Text</label>
+                  <label className="text-sm block mb-1">Text</label>
                   <input
                     type="color"
                     value={editForm.textColor}
                     onChange={(e) =>
-                      setEditForm({
-                        ...editForm,
-                        textColor: e.target.value,
-                      })
+                      setEditForm({ ...editForm, textColor: e.target.value })
                     }
                   />
                 </div>
@@ -221,13 +218,13 @@ function Home() {
                 <button
                   type="button"
                   onClick={() => setEditOpen(false)}
-                  className="bg-gray-300 px-4 py-2 rounded-md"
+                  className="px-4 py-2 rounded-md bg-gray-200 hover:bg-gray-300"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="bg-emerald-600 text-white px-4 py-2 rounded-md hover:bg-emerald-700"
+                  className="px-4 py-2 rounded-md bg-emerald-600 text-white hover:bg-emerald-700"
                 >
                   Update
                 </button>
