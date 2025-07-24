@@ -18,7 +18,7 @@ function Home() {
     _id: "",
   });
 
-  const user = JSON.parse(Cookies.get("user") || "{}");
+  const user = JSON.parse(Cookies.get("user"));
 
   const fetchTodos = async () => {
     try {
@@ -108,7 +108,7 @@ function Home() {
           <h2 className="text-2xl font-bold flex items-center gap-2 text-emerald-700">
             <ClipboardList className="w-6 h-6" />
             Welcome back,{" "}
-            <span className="capitalize">{user.fullname?.toLowerCase()}</span>
+            <span className="capitalize">{user?.fullname?.toLowerCase()}</span>
           </h2>
         </div>
 

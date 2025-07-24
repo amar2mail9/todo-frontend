@@ -33,6 +33,7 @@ function Login() {
       Cookies.set("token", data.accessToken, { expires: 1 });
       navigate("/");
       Cookies.set("user", JSON.stringify(data.user), { expires: 1 });
+      console.log(data.user);
     } catch (error) {
       toast.error(error.message || "Something went wrong");
     } finally {

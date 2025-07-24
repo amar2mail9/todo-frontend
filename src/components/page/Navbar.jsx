@@ -91,6 +91,9 @@ function Navbar() {
                       <p className="text-base capitalize font-semibold truncate">
                         {user.fullname?.toLowerCase() || user.username}
                       </p>
+                      <p className="text-base lowercase text-gray-500 font-semibold truncate">
+                        {user.username}
+                      </p>
                       <p className="text-sm text-gray-500 truncate">
                         {user.email}
                       </p>
@@ -149,6 +152,9 @@ function Navbar() {
                   <div className="pl-6 space-y-1">
                     {user && (
                       <div className="text-sm py-1 border-b border-gray-200 text-gray-600">
+                        <p className="capitalize text-sm text-gray-700">
+                          {user.fullname.toLowerCase()}
+                        </p>
                         {user.name || user.username || user.email}
                       </div>
                     )}
